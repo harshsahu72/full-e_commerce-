@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sahu Store — Premium Boutique. Shop T-shirts, hoodies, gym wear and more with curated quality." />
+  <title>Sahu Store — Premium Boutique</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍</text></svg>" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <!-- Logo -->
+    <a class="nav-logo" href="#" onclick="navigateTo('home')">
+      Sahu<span>Store</span>
+    </a>
+
+    <!-- Search -->
+    <div class="nav-search">
+      <span class="nav-search-icon">🔍</span>
+      <input id="nav-search-input" type="text" placeholder="Search products, brands, categories..." />
+    </div>
+
+    <!-- Nav Links -->
+    <div class="nav-links">
+      <a class="nav-link mobile-show" data-page="home" href="#" onclick="navigateTo('home')">Home</a>
+      <a class="nav-link" data-page="products" href="#" onclick="navigateTo('products')">Products</a>
+      <a class="nav-link" data-page="orders" href="#" onclick="navigateTo('orders')">Orders</a>
+
+      <!-- Cart Button -->
+      <button class="nav-cart-btn" onclick="openCartSidebar()" id="nav-cart-btn">
+        🛒 Cart
+        <span class="nav-cart-badge cart-count-badge" id="cart-nav-badge" style="display:none">0</span>
+      </button>
+
+      <!-- Auth (logged out) -->
+      <div id="nav-auth-section" style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="openAuthModal('login')" id="nav-login-btn">Login</button>
+        <button class="btn btn-primary btn-sm" onclick="openAuthModal('register')" id="nav-signup-btn">Sign Up</button>
+      </div>
+
+      <!-- User Menu (logged in) -->
+      <div id="nav-user-section" style="display:none;position:relative">
+        <button class="nav-user-btn" id="nav-user-trigger">
+          <div class="nav-avatar" id="nav-user-avatar">U</div>
+          <span id="nav-user-name">User</span>
+          <span>▾</span>
+        </button>
+        <div class="nav-dropdown" id="nav-dropdown">
+          <a href="#" onclick="navigateTo('orders'); document.getElementById('nav-dropdown').classList.remove('open')">📦 My Orders</a>
+          <hr />
+          <button onclick="AuthManager.logout()">🚪 Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hamburger (mobile) -->
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     CART SIDEBAR
+══════════════════════════════════════════════════════ -->
+<div id="cart-overlay" onclick="closeCartSidebar()"></div>
+<aside id="cart-sidebar">
+  <div class="cart-header">
+    <h3>🛒 Your Cart</h3>
+    <button class="cart-close-btn" onclick="closeCartSidebar()">×</button>
+  </div>
+  <div class="cart-items" id="cart-sidebar-items"></div>
+  <div class="cart-footer" id="cart-sidebar-footer" style="display:none">
+    <div class="cart-summary">
+      <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
+      <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">₹0</span></div>
+      <div class="cart-total-row"><span>GST (18%)</span><span id="cart-tax">₹0</span></div>
+      <div class="cart-total-row grand"><span>Total</span><span id="cart-grand-total">₹0</span></div>
+    </div>
+    <button class="btn btn-primary btn-full btn-lg" onclick="closeCartSidebar(); proceedToCheckout()">
+      Checkout →
+    </button>
+    <button class="btn btn-ghost btn-full" style="margin-top:10px" onclick="closeCartSidebar(); navigateTo('cart')">
+      View Full Cart
+    </button>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════════
+     AUTH MODAL
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Welcome 👋</h2>
+      <button class="modal-close-btn" onclick="closeAuthModal()">×</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login" onclick="switchAuthTab('login')">Login</button>
+      <button class="modal-tab" data-tab="register" onclick="switchAuthTab('register')">Sign Up</button>
+    </div>
+    <div class="modal-body">
+      <!-- Login Form -->
+      <div id="login-form-wrap">
+        <form class="modal-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input id="login-email" class="form-input" type="email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input id="login-password" class="form-input" type="password" placeholder="Your password" required />
+          </div>
+          <button id="login-btn" class="btn btn-primary btn-full" type="submit">Login</button>
+          <p style="text-align:center;font-size:13px;color:var(--text-muted)">
+            Don't have an account? <button type="button" onclick="switchAuthTab('register')" style="background:none;border:none;color:var(--accent-light);font-weight:600;cursor:pointer">Sign Up</button>
+          </p>
+        </form>
+      </div>
+      <!-- Register Form -->
+      <div id="register-form-wrap" style="display:none">
+        <form class="modal-form" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input id="reg-name" class="form-input" type="text" placeholder="John Doe" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input id="reg-email" class="form-input" type="email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input id="reg-password" class="form-input" type="password" placeholder="Min 6 characters" minlength="6" required />
+          </div>
+          <button id="register-btn" class="btn btn-primary btn-full" type="submit">Create Account</button>
+          <p style="text-align:center;font-size:13px;color:var(--text-muted)">
+            Already have an account? <button type="button" onclick="switchAuthTab('login')" style="background:none;border:none;color:var(--accent-light);font-weight:600;cursor:pointer">Login</button>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     CHECKOUT MODAL
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="checkout-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h2 class="modal-title">Checkout 🚀</h2>
+      <button class="modal-close-btn" onclick="document.getElementById('checkout-modal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <form class="modal-form" onsubmit="placeOrder(); return false;">
+        <h4 style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:4px">📍 Shipping Address</h4>
+        <div class="form-group">
+          <label class="form-label">Street Address</label>
+          <input id="co-street" class="form-input" type="text" placeholder="123 Main Street, Apt 4B" required />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input id="co-city" class="form-input" type="text" placeholder="Mumbai" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <input id="co-state" class="form-input" type="text" placeholder="Maharashtra" required />
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">PIN Code</label>
+            <input id="co-zip" class="form-input" type="text" placeholder="400001" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <input id="co-country" class="form-input" type="text" placeholder="India" value="India" />
+          </div>
+        </div>
+        <h4 style="font-size:15px;font-weight:700;color:var(--text-secondary);margin:4px 0">💳 Payment</h4>
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select id="co-payment" class="form-select">
+            <option value="Card">Credit / Debit Card</option>
+            <option value="UPI">UPI</option>
+            <option value="COD">Cash on Delivery</option>
+          </select>
+        </div>
+        <div style="background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:600">Order Total</span>
+          <span style="font-size:20px;font-weight:800;color:var(--accent-light)" id="checkout-total-display">₹0</span>
+        </div>
+        <button id="place-order-btn" class="btn btn-primary btn-full btn-lg" type="submit">
+          🎉 Place Order
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: HOME
+══════════════════════════════════════════════════════ -->
+<main class="page active" id="page-home">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          New Collection 2024 — Up to 70% Off
+        </div>
+        <h1 class="hero-title">
+          Discover<br>
+          <span class="gradient-text">Premium</span><br>
+          Products
+        </h1>
+        <p class="hero-subtitle">
+          Shop the latest electronics, fashion, books, and more. Curated deals delivered to your doorstep.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" onclick="navigateTo('products')">
+            Shop Now →
+          </button>
+          <button class="btn btn-outline btn-lg" onclick="document.getElementById('categories-section').scrollIntoView({behavior:'smooth'})">
+            Browse Categories
+          </button>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">10K+</div>
+            <div class="hero-stat-label">Products</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">50K+</div>
+            <div class="hero-stat-label">Happy Customers</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">4.9★</div>
+            <div class="hero-stat-label">Avg Rating</div>
+          </div>
+        </div>
+      </div>
+      <!-- Hero Visual -->
+      <div class="hero-visual">
+        <div class="hero-orbits">
+          <div class="hero-orbit hero-orbit-1"></div>
+          <div class="hero-orbit hero-orbit-2"></div>
+        </div>
+        <div class="hero-product-card">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80" alt="Featured Product" />
+          <div class="hero-product-info">
+            <p class="hero-product-name">Sony WH-1000XM5</p>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="hero-product-price">₹24,990</span>
+              <button class="btn btn-primary btn-sm" onclick="navigateTo('products')">View</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section" id="categories-section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">✦ EXPLORE</div>
+        <h2 class="section-title">Shop by Category</h2>
+        <p class="section-subtitle">Find exactly what you're looking for</p>
+      </div>
+      <div class="categories-grid">
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('Electronics')">
+          <div class="category-icon">📱</div>
+          <div class="category-name">Electronics</div>
+          <div class="category-count">500+ items</div>
+        </div>
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('Clothing')">
+          <div class="category-icon">👕</div>
+          <div class="category-name">Clothing</div>
+          <div class="category-count">1200+ items</div>
+        </div>
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('Books')">
+          <div class="category-icon">📚</div>
+          <div class="category-name">Books</div>
+          <div class="category-count">800+ items</div>
+        </div>
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('Home & Garden')">
+          <div class="category-icon">🏠</div>
+          <div class="category-name">Home & Garden</div>
+          <div class="category-count">300+ items</div>
+        </div>
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('Sports')">
+          <div class="category-icon">⚽</div>
+          <div class="category-name">Sports</div>
+          <div class="category-count">400+ items</div>
+        </div>
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('Beauty')">
+          <div class="category-icon">💄</div>
+          <div class="category-name">Beauty</div>
+          <div class="category-count">250+ items</div>
+        </div>
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('Toys')">
+          <div class="category-icon">🧸</div>
+          <div class="category-name">Toys</div>
+          <div class="category-count">150+ items</div>
+        </div>
+        <div class="category-card" onclick="navigateTo('products'); filterByCategory('All')">
+          <div class="category-icon">🛍</div>
+          <div class="category-name">All Products</div>
+          <div class="category-count">3000+ items</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="section" style="background:linear-gradient(180deg,var(--bg-secondary) 0%,var(--bg-primary) 100%)">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">⭐ HANDPICKED</div>
+        <h2 class="section-title">Featured Products</h2>
+        <p class="section-subtitle">Our top picks for you this season</p>
+      </div>
+      <div class="products-grid" id="featured-products-grid">
+        <!-- Loaded dynamically -->
+      </div>
+      <div style="text-align:center;margin-top:40px">
+        <button class="btn btn-outline btn-lg" onclick="navigateTo('products')">View All Products →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Promo Banner -->
+  <section class="section">
+    <div class="container">
+      <div style="background:linear-gradient(135deg,#7c3aed 0%,#06b6d4 50%,#10b981 100%);border-radius:var(--radius-xl);padding:60px 48px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:url('https://www.transparenttextures.com/patterns/cubes.png');opacity:0.05"></div>
+        <div style="position:relative;z-index:1">
+          <p style="font-family:var(--font-display);font-size:clamp(24px,3vw,40px);font-weight:800;margin-bottom:12px">
+            🚚 Free Shipping on orders above ₹999!
+          </p>
+          <p style="font-size:16px;opacity:0.9;max-width:480px">Limited time offer. Shop your favourite products and get them delivered for free.</p>
+        </div>
+        <button class="btn btn-lg" style="background:#fff;color:#7c3aed;font-weight:700;flex-shrink:0;position:relative;z-index:1" onclick="navigateTo('products')">
+          Shop Now →
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: PRODUCTS
+══════════════════════════════════════════════════════ -->
+<main class="page" id="page-products">
+  <div class="container section">
+    <div style="margin-bottom:32px">
+      <h1 style="font-family:var(--font-display);font-size:34px;font-weight:800;margin-bottom:6px">All Products</h1>
+      <p style="color:var(--text-muted)" id="products-count">Loading...</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-chip active" data-cat="All" onclick="filterByCategory('All')">All</button>
+      <button class="filter-chip" data-cat="Electronics" onclick="filterByCategory('Electronics')">📱 Electronics</button>
+      <button class="filter-chip" data-cat="Clothing" onclick="filterByCategory('Clothing')">👕 Clothing</button>
+      <button class="filter-chip" data-cat="Books" onclick="filterByCategory('Books')">📚 Books</button>
+      <button class="filter-chip" data-cat="Home & Garden" onclick="filterByCategory('Home & Garden')">🏠 Home</button>
+      <button class="filter-chip" data-cat="Sports" onclick="filterByCategory('Sports')">⚽ Sports</button>
+      <button class="filter-chip" data-cat="Beauty" onclick="filterByCategory('Beauty')">💄 Beauty</button>
+
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <span style="font-size:13px;color:var(--text-muted)">Sort:</span>
+        <select class="form-select" style="padding:8px 36px 8px 12px;font-size:13px" onchange="setSort(this.value)" id="sort-select">
+          <option value="newest">Newest First</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Top Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" id="products-grid"></div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="products-pagination"></div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: PRODUCT DETAIL (Dynamically rendered)
+══════════════════════════════════════════════════════ -->
+<main class="page" id="page-product-detail">
+  <!-- Content injected by JS -->
+</main>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: CART
+══════════════════════════════════════════════════════ -->
+<main class="page" id="page-cart">
+  <div class="container section">
+    <h1 style="font-family:var(--font-display);font-size:34px;font-weight:800;margin-bottom:32px">🛒 Shopping Cart</h1>
+    <div id="cart-page-content"></div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: MY ORDERS
+══════════════════════════════════════════════════════ -->
+<main class="page" id="page-orders">
+  <div class="container section">
+    <h1 style="font-family:var(--font-display);font-size:34px;font-weight:800;margin-bottom:32px">📦 My Orders</h1>
+    <div class="order-list" id="orders-list">
+      <!-- Loaded dynamically -->
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-top-bar"></div>
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- Brand Column -->
+      <div class="footer-brand-col">
+        <div class="footer-brand-logo">AION</div>
+        <div class="footer-brand-divider"></div>
+        <p class="footer-brand-desc">A curated boutique for those who appreciate the art of living beautifully. Quality over quantity, always.</p>
+        <div class="footer-brand-tagline">&#10022; Est. 2025 &nbsp;&bull;&nbsp; Ranchi, India &#10022;</div>
+      </div>
+
+      <!-- Shop Column -->
+      <div>
+        <h4 class="footer-heading"><span class="footer-heading-icon">&#128717;</span> Shop</h4>
+        <div class="footer-links">
+          <a href="#" onclick="navigateTo('products')"><span class="footer-link-dot"></span>New Arrivals</a>
+          <a href="#" onclick="filterByCategory('Clothing');navigateTo('products')"><span class="footer-link-dot"></span>T-Shirts</a>
+          <a href="#" onclick="filterByCategory('Clothing');navigateTo('products')"><span class="footer-link-dot"></span>Hoodies</a>
+          <a href="#" onclick="filterByCategory('Clothing');navigateTo('products')"><span class="footer-link-dot"></span>Gym Wear</a>
+          <a href="#" onclick="navigateTo('products')"><span class="footer-link-dot"></span>Best Sellers</a>
+        </div>
+      </div>
+
+      <!-- Help Column -->
+      <div>
+        <h4 class="footer-heading"><span class="footer-heading-icon">&#128203;</span> Help</h4>
+        <div class="footer-links">
+          <a href="#"><span class="footer-link-dot"></span>Shipping Policy</a>
+          <a href="#"><span class="footer-link-dot"></span>Returns &amp; Refunds</a>
+          <a href="#"><span class="footer-link-dot"></span>Track Order</a>
+          <a href="#"><span class="footer-link-dot"></span>FAQs</a>
+          <a href="#"><span class="footer-link-dot"></span>Privacy Policy</a>
+        </div>
+      </div>
+
+      <!-- Store Info Column -->
+      <div>
+        <h4 class="footer-heading"><span class="footer-heading-icon">&#128205;</span> Store Info</h4>
+        <div class="footer-store-card">
+          <div class="store-info-row">
+            <span class="store-info-icon">&#127978;</span>
+            <div>
+              <strong>SAHU Premium Boutique</strong>
+            </div>
+          </div>
+          <div class="store-info-row">
+            <span class="store-info-icon">&#128205;</span>
+            <div>Dhurwa Ranchi Market,<br>RANCHI &ndash; 834004, India</div>
+          </div>
+          <div class="store-info-row">
+            <span class="store-info-icon">&#128222;</span>
+            <div>91-995506****</div>
+          </div>
+          <div class="store-info-row">
+            <span class="store-info-icon">&#9993;</span>
+            <div>SAHUi@gmail.com</div>
+          </div>
+          <div class="store-info-row">
+            <span class="store-info-icon">&#128336;</span>
+            <div>Mon&ndash;Sat: 10am &ndash; 8pm</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; 2025 SAHU. All rights reserved.</span>
+      <span class="footer-bottom-love">Made with <span class="heart">&hearts;</span> in India &nbsp;&#127470;&#127475;</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/api.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
