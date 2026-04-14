@@ -129,7 +129,7 @@ This project is licensed under the **ISC License**.
 
 ---
 
-> Built with ❤️ by **SAHU Store / AION**
+> Built with ❤️ by **SAHU Boutique / AION**
 >
 > ## 👨‍💻 Author
 
