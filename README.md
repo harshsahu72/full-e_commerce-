@@ -135,3 +135,5 @@ This project is licensed under the **ISC License**.
 
 **Harsh Kumar**
  | Student
+ << Working on Frontend Designing
+ << working on web developer
