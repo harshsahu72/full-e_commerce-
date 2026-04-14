@@ -1,4 +1,4 @@
-# 🛍️ AION — Full-Stack E-Commerce (SAHU Store)
+# 🛍️ AION — Full-Stack E-Commerce (SAHU Boutique)
 
 A premium, full-stack eCommerce application built with **Node.js**, **Express**, **MongoDB**, and a **Vanilla JS** frontend. Features a complete shopping experience with user authentication, product browsing, cart management, and order tracking — all wrapped in a sleek boutique aesthetic.
 
