@@ -1,4 +1,3 @@
-<<<
 # 🛍️ AION — Full-Stack E-Commerce (SAHU Store)
 
 A premium, full-stack eCommerce application built with **Node.js**, **Express**, **MongoDB**, and a **Vanilla JS** frontend. Features a complete shopping experience with user authentication, product browsing, cart management, and order tracking — all wrapped in a sleek boutique aesthetic.
@@ -131,4 +130,8 @@ This project is licensed under the **ISC License**.
 ---
 
 > Built with ❤️ by **SAHU Store / AION**
-P
+>
+> ## 👨‍💻 Author
+
+**Harsh Kumar**
+ | Student
